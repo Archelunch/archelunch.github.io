@@ -551,17 +551,13 @@ class Game {
     }
 
     handlePlayerDeath(player) {
-        // Add death visual effects before killing player
+        // Add death visual effects at the player's position before killing player
         if (this.deathEffects) {
-            // Create fancy multi-stage death animation that will properly remove the player from view
-            this.deathEffects.addPlayerDeathAnimation(player);
-            
-            // Kill the player which returns player info
-            const playerInfo = player.kill();
-        } else {
-            // Just kill the player if no death effects system available
-            player.kill();
+            this.deathEffects.addDeathEffect(player.x, player.y, player.colors[0], player.emoji, player.getDeathPhrase());
         }
+        
+        // Kill player (changes isAlive state but keeps them in the players array)
+        player.kill();
         
         // Play death sound
         this.sounds.death.play();

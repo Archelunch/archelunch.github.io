@@ -36,6 +36,8 @@ class Player {
     }
     
     update(targetX, targetY) {
+        if (!this.isAlive) return; // Don't update dead players
+        
         // Update target position
         this.targetX = targetX;
         this.targetY = targetY;
@@ -67,7 +69,7 @@ class Player {
     }
     
     draw(ctx) {
-        if (!this.isAlive) return;
+        if (!this.isAlive) return; // Don't draw dead players - they'll be drawn as corpses by DeathEffects
         
         // Save context for transformations
         ctx.save();
@@ -132,6 +134,8 @@ class Player {
     }
     
     isPointInside(x, y) {
+        if (!this.isAlive) return false; // Dead players can't be clicked
+        
         const dx = this.x - x;
         const dy = this.y - y;
         const distanceSquared = dx * dx + dy * dy;
@@ -141,16 +145,6 @@ class Player {
     
     kill() {
         this.isAlive = false;
-        
-        return {
-            id: this.id,
-            x: this.x,
-            y: this.y,
-            emoji: this.emoji,
-            colors: this.colors,
-            name: this.name,
-            deathPhrase: this.deathPhrase
-        };
     }
     
     respawn(x, y) {
