@@ -1,8 +1,8 @@
 class DeathEffects {
     constructor(canvas) {
         this.canvas = canvas;
-        this.ctx = this.canvas.getContext('2d');
-        this.activeEffects = [];
+        this.effects = [];
+        this.textBubbles = [];
         
         // Funny death phrases
         this.deathPhrases = [
@@ -31,162 +31,187 @@ class DeathEffects {
     }
     
     addDeathEffect(x, y, color, emoji, customPhrase = null) {
-        // Create a death effect with animation and speech bubble
-        const phrase = customPhrase || this.deathPhrases[Math.floor(Math.random() * this.deathPhrases.length)];
-        
-        const effect = {
-            x: x,
-            y: y,
-            emoji: emoji,
-            color: color,
-            phrase: phrase,
-            age: 0,
-            maxAge: 1500, // Effect lasts 1.5 seconds
-            particles: this.generateDeathParticles(x, y, color),
-            speechBubble: {
-                x: x + 20,
-                y: y - 30,
-                width: 0, // Will be calculated based on text
-                height: 0,
-                phrase: phrase
-            }
-        };
-        
-        // Measure text for speech bubble
-        this.ctx.font = '18px "Comic Sans MS", cursive, sans-serif';
-        const metrics = this.ctx.measureText(phrase);
-        effect.speechBubble.width = metrics.width + 20;
-        effect.speechBubble.height = 40;
-        
-        this.activeEffects.push(effect);
-        return effect;
-    }
-    
-    generateDeathParticles(x, y, color) {
-        const particles = [];
-        const particleCount = 20;
-        
-        for (let i = 0; i < particleCount; i++) {
+        // Create explosion particles
+        for (let i = 0; i < 20; i++) {
+            const speed = Math.random() * 5 + 2;
             const angle = Math.random() * Math.PI * 2;
-            const speed = Math.random() * 6 + 3;
+            const size = Math.random() * 8 + 4;
             
-            particles.push({
+            this.effects.push({
                 x: x,
                 y: y,
-                size: Math.random() * 10 + 5,
-                speedX: Math.cos(angle) * speed,
-                speedY: Math.sin(angle) * speed,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
                 color: color,
-                opacity: 1,
-                gravity: 0.15,
-                rotation: Math.random() * 360,
-                rotationSpeed: (Math.random() - 0.5) * 15
+                size: size,
+                type: 'particle',
+                life: 100,
+                maxLife: 100
             });
         }
         
-        return particles;
+        // Add emoji particle that flies upward
+        this.effects.push({
+            x: x,
+            y: y,
+            vx: (Math.random() - 0.5) * 2,
+            vy: -5 - Math.random() * 3,
+            emoji: emoji,
+            size: 30,
+            type: 'emoji',
+            life: 80,
+            maxLife: 80,
+            angle: Math.random() * 0.4 - 0.2, // Small initial rotation
+            vAngle: (Math.random() - 0.5) * 0.1, // Rotation speed
+        });
+        
+        // Add death phrase text bubble
+        const phrase = customPhrase || this.deathPhrases[Math.floor(Math.random() * this.deathPhrases.length)];
+        this.textBubbles.push({
+            x: x,
+            y: y - 30, // Position above the death location
+            text: phrase,
+            life: 2000, // Match the 2 second visibility of player
+            maxLife: 2000,
+            opacity: 1
+        });
     }
     
     update(deltaTime) {
-        // Update all active death effects
-        for (let i = this.activeEffects.length - 1; i >= 0; i--) {
-            const effect = this.activeEffects[i];
+        // Update particles
+        for (let i = 0; i < this.effects.length; i++) {
+            const effect = this.effects[i];
             
-            // Update effect age
-            effect.age += deltaTime;
-            if (effect.age >= effect.maxAge) {
-                this.activeEffects.splice(i, 1);
-                continue;
+            // Apply gravity to particles
+            effect.vy += 0.1;
+            
+            // Update position
+            effect.x += effect.vx;
+            effect.y += effect.vy;
+            
+            // Update rotation for emoji
+            if (effect.type === 'emoji' && effect.angle !== undefined) {
+                effect.angle += effect.vAngle;
             }
             
-            // Update particles
-            for (const particle of effect.particles) {
-                particle.x += particle.speedX;
-                particle.y += particle.speedY;
-                particle.speedY += particle.gravity;
-                particle.opacity = 1 - (effect.age / effect.maxAge);
-                particle.rotation += particle.rotationSpeed;
+            // Reduce life
+            effect.life -= 1;
+            
+            // Remove dead effects
+            if (effect.life <= 0) {
+                this.effects.splice(i, 1);
+                i--;
+            }
+        }
+        
+        // Update text bubbles
+        for (let i = 0; i < this.textBubbles.length; i++) {
+            const bubble = this.textBubbles[i];
+            
+            // Float upward slowly
+            bubble.y -= 0.5;
+            
+            // Reduce life
+            bubble.life -= deltaTime;
+            
+            // Make bubble fade out in the last 500ms
+            if (bubble.life < 500) {
+                bubble.opacity = bubble.life / 500;
+            }
+            
+            // Remove dead bubbles
+            if (bubble.life <= 0) {
+                this.textBubbles.splice(i, 1);
+                i--;
             }
         }
     }
     
     draw() {
-        this.ctx.save();
+        const ctx = this.canvas.getContext('2d');
         
-        for (const effect of this.activeEffects) {
-            // Calculate fade factor
-            const fadeFactor = 1 - (effect.age / effect.maxAge);
+        // Draw particles
+        for (const effect of this.effects) {
+            ctx.save();
             
-            // Draw particles
-            for (const particle of effect.particles) {
-                this.ctx.globalAlpha = particle.opacity;
-                this.ctx.fillStyle = particle.color;
-                
-                this.ctx.save();
-                this.ctx.translate(particle.x, particle.y);
-                this.ctx.rotate(particle.rotation * Math.PI / 180);
-                
-                this.ctx.beginPath();
-                this.ctx.arc(0, 0, particle.size / 2, 0, Math.PI * 2);
-                this.ctx.fill();
-                
-                this.ctx.restore();
+            // Set opacity based on life
+            ctx.globalAlpha = effect.life / effect.maxLife;
+            
+            if (effect.type === 'particle') {
+                // Draw particle
+                ctx.fillStyle = effect.color;
+                ctx.beginPath();
+                ctx.arc(effect.x, effect.y, effect.size, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (effect.type === 'emoji') {
+                // Draw emoji with rotation
+                ctx.translate(effect.x, effect.y);
+                ctx.rotate(effect.angle || 0);
+                ctx.font = `${effect.size}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(effect.emoji, 0, 0);
             }
             
-            // Draw speech bubble
-            this.drawSpeechBubble(
-                effect.speechBubble.x, 
-                effect.speechBubble.y, 
-                effect.speechBubble.width, 
-                effect.speechBubble.height, 
-                effect.phrase,
-                fadeFactor
-            );
-            
-            // Draw fading emoji
-            this.ctx.save();
-            this.ctx.globalAlpha = fadeFactor * 0.8;
-            this.ctx.font = '32px Arial';
-            this.ctx.textAlign = 'center';
-            this.ctx.textBaseline = 'middle';
-            this.ctx.fillText(effect.emoji, effect.x, effect.y);
-            this.ctx.restore();
+            ctx.restore();
         }
         
-        this.ctx.restore();
+        // Draw text bubbles
+        for (const bubble of this.textBubbles) {
+            ctx.save();
+            
+            // Draw bubble
+            ctx.globalAlpha = bubble.opacity;
+            
+            // Text bubble background
+            const textWidth = ctx.measureText(bubble.text).width;
+            const padding = 10;
+            const bubbleWidth = textWidth + padding * 2;
+            const bubbleHeight = 30;
+            
+            // Draw rounded rectangle for bubble
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            this.roundRect(
+                ctx, 
+                bubble.x - bubbleWidth / 2, 
+                bubble.y - bubbleHeight / 2, 
+                bubbleWidth, 
+                bubbleHeight, 
+                8
+            );
+            
+            // Add small triangle pointer at bottom of bubble
+            ctx.beginPath();
+            ctx.moveTo(bubble.x - 8, bubble.y + bubbleHeight / 2);
+            ctx.lineTo(bubble.x, bubble.y + bubbleHeight / 2 + 8);
+            ctx.lineTo(bubble.x + 8, bubble.y + bubbleHeight / 2);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Draw text
+            ctx.fillStyle = 'white';
+            ctx.font = '14px "Comic Sans MS", cursive, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(bubble.text, bubble.x, bubble.y);
+            
+            ctx.restore();
+        }
     }
     
-    drawSpeechBubble(x, y, width, height, text, opacity) {
-        this.ctx.save();
-        
-        this.ctx.globalAlpha = opacity;
-        
-        // Draw bubble
-        this.ctx.fillStyle = 'white';
-        this.ctx.strokeStyle = '#333';
-        this.ctx.lineWidth = 2;
-        
-        // Bubble body
-        this.ctx.beginPath();
-        this.ctx.roundRect(x, y, width, height, 10);
-        this.ctx.fill();
-        this.ctx.stroke();
-        
-        // Bubble tail/pointer
-        this.ctx.beginPath();
-        this.ctx.moveTo(x + 10, y + height);
-        this.ctx.lineTo(x - 5, y + height + 15);
-        this.ctx.lineTo(x + 25, y + height);
-        this.ctx.fill();
-        this.ctx.stroke();
-        
-        // Text
-        this.ctx.fillStyle = '#333';
-        this.ctx.font = '18px "Comic Sans MS", cursive, sans-serif';
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.fillText(text, x + width/2, y + height/2);
-        
-        this.ctx.restore();
+    // Helper function to draw rounded rectangles
+    roundRect(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+        ctx.fill();
     }
 } 

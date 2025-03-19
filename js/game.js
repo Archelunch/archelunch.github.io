@@ -556,6 +556,7 @@ class Game {
             this.deathEffects.addDeathEffect(player.x, player.y, player.colors[0], player.emoji, player.getDeathPhrase());
         }
         
+        // Kill player - this will keep them visible for 2 seconds then hide them
         player.kill();
         
         // Play death sound
@@ -602,9 +603,6 @@ class Game {
         
         // Update death effects
         this.deathEffects.update(deltaTime);
-        
-        // Check for corpses to remove (after 2 seconds)
-        this.checkAndRemoveCorpses();
         
         // Update scoreboard
         this.ui.updateScoreboard(this.players);
@@ -887,20 +885,6 @@ class Game {
         osc.start();
         noiseSource.stop(this.audioContext.currentTime + duration);
         osc.stop(this.audioContext.currentTime + duration);
-    }
-
-    checkAndRemoveCorpses() {
-        const currentTime = Date.now();
-        const corpseRemovalDelay = 2000; // 2 seconds
-        
-        this.players.forEach(player => {
-            // If player is dead, has a visible corpse, and died more than 2 seconds ago
-            if (!player.isAlive && player.isCorpseVisible && 
-                player.deathTime > 0 && currentTime - player.deathTime > corpseRemovalDelay) {
-                // Remove corpse from display
-                player.removeCorpse();
-            }
-        });
     }
 }
 

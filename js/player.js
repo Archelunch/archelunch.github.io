@@ -13,8 +13,8 @@ class Player {
         this.isAlive = true;
         this.isLocalPlayer = isLocalPlayer;
         this.score = 0;
-        this.deathTime = 0; // Track when player died
-        this.isCorpseVisible = true; // Track if corpse should be visible
+        this.isVisible = true; // New property to track visibility
+        this.deathTextTimeout = null; // To store timeout reference
         
         // Custom player info
         this.name = customInfo.name || `Player_${id.substring(0, 6)}`;
@@ -69,8 +69,8 @@ class Player {
     }
     
     draw(ctx) {
-        // Don't draw if player is dead and corpse should be hidden
-        if (!this.isAlive && !this.isCorpseVisible) return;
+        // Don't draw if player is not alive and visible
+        if (!this.isAlive || !this.isVisible) return;
         
         // Save context for transformations
         ctx.save();
@@ -85,15 +85,10 @@ class Player {
         const pulseScale = 1 + Math.sin(this.pulsePhase) * this.pulseAmount;
         const scaledRadius = this.radius * pulseScale;
         
-        // If player is dead, draw as corpse
-        if (!this.isAlive) {
-            this.drawCorpse(ctx, scaledRadius);
-        } else {
-            this.drawShadow(ctx, scaledRadius);
-            this.drawBody(ctx, scaledRadius);
-            this.drawEmoji(ctx, scaledRadius);
-            this.drawName(ctx, scaledRadius);
-        }
+        this.drawShadow(ctx, scaledRadius);
+        this.drawBody(ctx, scaledRadius);
+        this.drawEmoji(ctx, scaledRadius);
+        this.drawName(ctx, scaledRadius);
         
         // Restore context
         ctx.restore();
@@ -139,29 +134,10 @@ class Player {
         ctx.fillText(this.name, 0, radius + 15);
     }
     
-    drawCorpse(ctx, radius) {
-        // Draw a "dead" version of the fly
-        // Draw squished shadow
-        ctx.beginPath();
-        ctx.ellipse(3, 3, radius * 1.2, radius * 0.5, 0, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-        ctx.fill();
-        
-        // Draw squished body
-        ctx.beginPath();
-        ctx.ellipse(0, 0, radius * 1.2, radius * 0.5, 0, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(150, 150, 150, 0.7)';
-        ctx.fill();
-        
-        // Draw X eyes
-        ctx.font = `${radius * 0.8}px Arial`;
-        ctx.fillStyle = '#ff0000';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('☠️', 0, 0);
-    }
-    
     isPointInside(x, y) {
+        // Dead players can't be clicked
+        if (!this.isAlive || !this.isVisible) return false;
+        
         const dx = this.x - x;
         const dy = this.y - y;
         const distanceSquared = dx * dx + dy * dy;
@@ -171,22 +147,33 @@ class Player {
     
     kill() {
         this.isAlive = false;
-        this.deathTime = Date.now();
-        this.isCorpseVisible = true;
-    }
-    
-    removeCorpse() {
-        this.isCorpseVisible = false;
+        
+        // Clear any existing timeout to prevent bugs
+        if (this.deathTextTimeout) {
+            clearTimeout(this.deathTextTimeout);
+        }
+        
+        // Keep the player visible for 2 seconds after death to show death effects
+        // then hide it until respawn
+        this.deathTextTimeout = setTimeout(() => {
+            this.isVisible = false;
+        }, 2000);
     }
     
     respawn(x, y) {
+        // Clear any existing timeout to prevent bugs
+        if (this.deathTextTimeout) {
+            clearTimeout(this.deathTextTimeout);
+            this.deathTextTimeout = null;
+        }
+        
+        // Update position and state
         this.x = x;
         this.y = y;
         this.targetX = x;
         this.targetY = y;
         this.isAlive = true;
-        this.isCorpseVisible = true;
-        this.deathTime = 0;
+        this.isVisible = true; // Make player visible again on respawn
     }
     
     increaseScore() {
