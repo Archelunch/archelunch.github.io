@@ -165,7 +165,14 @@ class AIPlayer extends Player {
     }
     
     draw(ctx) {
-        if (!this.isAlive) return;
+        // Use parent check for visibility first
+        if (!this.isAlive && !this.isCorpseVisible) return;
+        
+        if (!this.isAlive) {
+            // Call parent corpse drawing
+            super.drawCorpse(ctx, this.radius);
+            return;
+        }
         
         // Calculate the wobble effect for AI flies
         this.rotationAngle = Math.sin(Date.now() / 200) * (this.crazyMode ? 0.4 : 0.2);
@@ -174,7 +181,7 @@ class AIPlayer extends Player {
         super.draw(ctx);
         
         // Add "CRAZY" indicator only for AI players in crazy mode
-        if (this.crazyMode) {
+        if (this.crazyMode && this.isAlive) {
             ctx.save();
             ctx.translate(this.x, this.y);
             ctx.font = '12px "Comic Sans MS", cursive, sans-serif';

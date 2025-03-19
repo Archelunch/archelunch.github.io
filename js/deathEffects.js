@@ -1,182 +1,192 @@
 class DeathEffects {
     constructor(canvas) {
         this.canvas = canvas;
-        this.ctx = canvas.getContext('2d');
-        this.effects = [];
-        
-        // Corpse effects to handle removing dead players gracefully
-        this.corpseEffects = [];
+        this.ctx = this.canvas.getContext('2d');
+        this.activeEffects = [];
         
         // Funny death phrases
         this.deathPhrases = [
             "SPLAT!",
-            "Buzz-ted!",
-            "Bug off!",
-            "Squished!",
-            "Swatted!",
             "Fly no more!",
-            "Ouch!",
-            "Exterminated!",
-            "Game Over!",
-            "Smacked!"
+            "Buzz-ted!",
+            "Fly heaven awaits...",
+            "Fly-nally got me!",
+            "I'm ex-TERMIN-ated!",
+            "That stings!",
+            "Swatted!",
+            "Bug off!",
+            "Fly's up!",
+            "What a way to go...",
+            "I've been fly-leted!",
+            "No more buzzing around!",
+            "That really bugs me!",
+            "Windshield effect!",
+            "Insect-icide!",
+            "My compound eyes!",
+            "Fly me to the moon...",
+            "Fly-nal destination!",
+            "Bugzinga!",
+            "I'm squashed!"
         ];
     }
     
-    addDeathEffect(x, y, color, emoji, customPhrase) {
-        // Use custom phrase if provided, otherwise random from list
+    addDeathEffect(x, y, color, emoji, customPhrase = null) {
+        // Create a death effect with animation and speech bubble
         const phrase = customPhrase || this.deathPhrases[Math.floor(Math.random() * this.deathPhrases.length)];
         
-        // Create standard particle explosion
-        const particleCount = 20 + Math.floor(Math.random() * 10);
-        const particles = [];
-        
-        for (let i = 0; i < particleCount; i++) {
-            particles.push({
-                x: x,
-                y: y,
-                size: 2 + Math.random() * 8,
-                color: color,
-                speedX: (Math.random() - 0.5) * 10,
-                speedY: (Math.random() - 0.5) * 10,
-                opacity: 1,
-                gravity: 0.15 + Math.random() * 0.1
-            });
-        }
-        
-        // Create text effect for death phrase
-        const textEffect = {
-            x: x,
-            y: y - 40,
-            text: phrase,
-            color: "#ff0000",
-            opacity: 1,
-            size: 24,
-            speedY: -2
-        };
-        
-        // Add to effects array
-        this.effects.push({
-            particles,
-            textEffect,
-            age: 0,
-            maxAge: 1500 // Effect lasts 1.5 seconds
-        });
-        
-        // Create corpse effect to handle the player's body fading out
-        this.addCorpseEffect(x, y, emoji);
-    }
-    
-    addCorpseEffect(x, y, emoji) {
-        // Create a corpse effect that will make the dead player fade out and fall
-        this.corpseEffects.push({
+        const effect = {
             x: x,
             y: y,
             emoji: emoji,
-            opacity: 1,
-            rotation: 0,
-            scale: 1,
-            speedY: 0.5, // Initial falling speed
+            color: color,
+            phrase: phrase,
             age: 0,
-            maxAge: 2000 // Corpse effect lasts 2 seconds
-        });
+            maxAge: 1500, // Effect lasts 1.5 seconds
+            particles: this.generateDeathParticles(x, y, color),
+            speechBubble: {
+                x: x + 20,
+                y: y - 30,
+                width: 0, // Will be calculated based on text
+                height: 0,
+                phrase: phrase
+            }
+        };
+        
+        // Measure text for speech bubble
+        this.ctx.font = '18px "Comic Sans MS", cursive, sans-serif';
+        const metrics = this.ctx.measureText(phrase);
+        effect.speechBubble.width = metrics.width + 20;
+        effect.speechBubble.height = 40;
+        
+        this.activeEffects.push(effect);
+        return effect;
+    }
+    
+    generateDeathParticles(x, y, color) {
+        const particles = [];
+        const particleCount = 20;
+        
+        for (let i = 0; i < particleCount; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * 6 + 3;
+            
+            particles.push({
+                x: x,
+                y: y,
+                size: Math.random() * 10 + 5,
+                speedX: Math.cos(angle) * speed,
+                speedY: Math.sin(angle) * speed,
+                color: color,
+                opacity: 1,
+                gravity: 0.15,
+                rotation: Math.random() * 360,
+                rotationSpeed: (Math.random() - 0.5) * 15
+            });
+        }
+        
+        return particles;
     }
     
     update(deltaTime) {
-        // Update regular death effects
-        for (let i = this.effects.length - 1; i >= 0; i--) {
-            const effect = this.effects[i];
-            effect.age += deltaTime;
+        // Update all active death effects
+        for (let i = this.activeEffects.length - 1; i >= 0; i--) {
+            const effect = this.activeEffects[i];
             
-            // Remove effect if it's too old
+            // Update effect age
+            effect.age += deltaTime;
             if (effect.age >= effect.maxAge) {
-                this.effects.splice(i, 1);
+                this.activeEffects.splice(i, 1);
                 continue;
             }
             
             // Update particles
             for (const particle of effect.particles) {
-                // Apply gravity
-                particle.speedY += particle.gravity;
-                
-                // Move particle
                 particle.x += particle.speedX;
                 particle.y += particle.speedY;
-                
-                // Fade out particle
-                particle.opacity = 1 - effect.age / effect.maxAge;
+                particle.speedY += particle.gravity;
+                particle.opacity = 1 - (effect.age / effect.maxAge);
+                particle.rotation += particle.rotationSpeed;
             }
-            
-            // Update text effect
-            const textEffect = effect.textEffect;
-            textEffect.y += textEffect.speedY;
-            textEffect.speedY *= 0.98; // Slow down over time
-            textEffect.opacity = 1 - effect.age / effect.maxAge;
-        }
-        
-        // Update corpse effects
-        for (let i = this.corpseEffects.length - 1; i >= 0; i--) {
-            const corpse = this.corpseEffects[i];
-            corpse.age += deltaTime;
-            
-            // Remove corpse if it's too old
-            if (corpse.age >= corpse.maxAge) {
-                this.corpseEffects.splice(i, 1);
-                continue;
-            }
-            
-            // Update corpse position - make it fall with increasing speed
-            corpse.speedY += 0.05; // Gravity
-            corpse.y += corpse.speedY;
-            
-            // Add some rotation to make it look like it's tumbling
-            corpse.rotation += 0.1;
-            
-            // Fade out gradually
-            corpse.opacity = 1 - (corpse.age / corpse.maxAge);
-            
-            // Shrink slightly as it falls
-            corpse.scale = 1 - (0.5 * corpse.age / corpse.maxAge);
         }
     }
     
     draw() {
-        // Draw text effects and particles
-        for (const effect of this.effects) {
+        this.ctx.save();
+        
+        for (const effect of this.activeEffects) {
+            // Calculate fade factor
+            const fadeFactor = 1 - (effect.age / effect.maxAge);
+            
             // Draw particles
             for (const particle of effect.particles) {
-                this.ctx.save();
-                this.ctx.fillStyle = particle.color;
                 this.ctx.globalAlpha = particle.opacity;
+                this.ctx.fillStyle = particle.color;
+                
+                this.ctx.save();
+                this.ctx.translate(particle.x, particle.y);
+                this.ctx.rotate(particle.rotation * Math.PI / 180);
+                
                 this.ctx.beginPath();
-                this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                this.ctx.arc(0, 0, particle.size / 2, 0, Math.PI * 2);
                 this.ctx.fill();
+                
                 this.ctx.restore();
             }
             
-            // Draw text effect
-            const textEffect = effect.textEffect;
+            // Draw speech bubble
+            this.drawSpeechBubble(
+                effect.speechBubble.x, 
+                effect.speechBubble.y, 
+                effect.speechBubble.width, 
+                effect.speechBubble.height, 
+                effect.phrase,
+                fadeFactor
+            );
+            
+            // Draw fading emoji
             this.ctx.save();
-            this.ctx.font = `bold ${textEffect.size}px 'Comic Sans MS', cursive, sans-serif`;
-            this.ctx.fillStyle = textEffect.color;
-            this.ctx.globalAlpha = textEffect.opacity;
+            this.ctx.globalAlpha = fadeFactor * 0.8;
+            this.ctx.font = '32px Arial';
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
-            this.ctx.fillText(textEffect.text, textEffect.x, textEffect.y);
+            this.ctx.fillText(effect.emoji, effect.x, effect.y);
             this.ctx.restore();
         }
         
-        // Draw corpse effects
-        for (const corpse of this.corpseEffects) {
-            this.ctx.save();
-            this.ctx.translate(corpse.x, corpse.y);
-            this.ctx.rotate(corpse.rotation);
-            this.ctx.scale(corpse.scale, corpse.scale);
-            this.ctx.globalAlpha = corpse.opacity;
-            this.ctx.font = '36px Arial';
-            this.ctx.textAlign = 'center';
-            this.ctx.textBaseline = 'middle';
-            this.ctx.fillText(corpse.emoji, 0, 0);
-            this.ctx.restore();
-        }
+        this.ctx.restore();
+    }
+    
+    drawSpeechBubble(x, y, width, height, text, opacity) {
+        this.ctx.save();
+        
+        this.ctx.globalAlpha = opacity;
+        
+        // Draw bubble
+        this.ctx.fillStyle = 'white';
+        this.ctx.strokeStyle = '#333';
+        this.ctx.lineWidth = 2;
+        
+        // Bubble body
+        this.ctx.beginPath();
+        this.ctx.roundRect(x, y, width, height, 10);
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Bubble tail/pointer
+        this.ctx.beginPath();
+        this.ctx.moveTo(x + 10, y + height);
+        this.ctx.lineTo(x - 5, y + height + 15);
+        this.ctx.lineTo(x + 25, y + height);
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Text
+        this.ctx.fillStyle = '#333';
+        this.ctx.font = '18px "Comic Sans MS", cursive, sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText(text, x + width/2, y + height/2);
+        
+        this.ctx.restore();
     }
 } 
