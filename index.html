@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fly PvP Clicker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+        <div id="central-button">
+            <span>DON'T</span>
+            <span>TOUCH</span>
+            <span>ME!</span>
+        </div>
+        <div id="death-banner" class="hidden">You Died</div>
+        <div id="scoreboard">
+            <div class="scoreboard-header">
+                <h2>Scoreboard</h2>
+                <button id="toggle-scoreboard">⇄</button>
+            </div>
+            <ul id="scores"></ul>
+        </div>
+        
+        <!-- Compact score display (hidden initially) -->
+        <div id="compact-score" class="hidden">
+            <span id="player-rank"></span>
+            <span id="player-emoji"></span>
+            <span id="player-score"></span>
+        </div>
+        
+        <!-- Settings button -->
+        <div id="settings-button">⚙️</div>
+        
+        <!-- Settings panel -->
+        <div id="settings-panel" class="hidden">
+            <div class="settings-header">
+                <h2>Settings</h2>
+                <span id="close-settings">×</span>
+            </div>
+            <div class="customization-section">
+                <label>Change your insect:</label>
+                <div class="emoji-options">
+                    <div class="emoji-option" data-emoji="🪰">🪰</div>
+                    <div class="emoji-option" data-emoji="🦟">🦟</div>
+                    <div class="emoji-option" data-emoji="🐝">🐝</div>
+                    <div class="emoji-option" data-emoji="🦗">🦗</div>
+                    <div class="emoji-option" data-emoji="🐞">🐞</div>
+                    <div class="emoji-option" data-emoji="🦋">🦋</div>
+                    <div class="emoji-option" data-emoji="🐜">🐜</div>
+                    <div class="emoji-option" data-emoji="🕷️">🕷️</div>
+                </div>
+            </div>
+            <div class="customization-section">
+                <label>Change your death phrase:</label>
+                <div class="phrase-options">
+                    <div class="phrase-option" data-phrase="SPLAT!">SPLAT!</div>
+                    <div class="phrase-option" data-phrase="Buzz-ted!">Buzz-ted!</div>
+                    <div class="phrase-option" data-phrase="Bug off!">Bug off!</div>
+                    <div class="phrase-option" data-phrase="Squished!">Squished!</div>
+                    <div class="phrase-option" data-phrase="Swatted!">Swatted!</div>
+                    <div class="phrase-option" data-phrase="Game Over!">Game Over!</div>
+                </div>
+            </div>
+            <button id="save-settings-btn">Save Settings</button>
+        </div>
+        
+        <!-- Start screen with player customization -->
+        <div id="start-screen">
+            <div id="customization-container">
+                <h1>Fly PvP Clicker</h1>
+                
+                <div class="customization-section">
+                    <label for="player-name">Enter your name:</label>
+                    <input type="text" id="player-name" maxlength="15" placeholder="Your name (max 15 chars)" value="Player">
+                    <div class="character-count"><span id="name-char-count">0</span>/15</div>
+                </div>
+                
+                <div class="customization-section">
+                    <label>Choose your insect:</label>
+                    <div class="emoji-options">
+                        <div class="emoji-option selected" data-emoji="🪰">🪰</div>
+                        <div class="emoji-option" data-emoji="🦟">🦟</div>
+                        <div class="emoji-option" data-emoji="🐝">🐝</div>
+                        <div class="emoji-option" data-emoji="🦗">🦗</div>
+                        <div class="emoji-option" data-emoji="🐞">🐞</div>
+                        <div class="emoji-option" data-emoji="🦋">🦋</div>
+                        <div class="emoji-option" data-emoji="🐜">🐜</div>
+                        <div class="emoji-option" data-emoji="🕷️">🕷️</div>
+                    </div>
+                </div>
+                
+                <div class="customization-section">
+                    <label>Choose your death phrase:</label>
+                    <div class="phrase-options">
+                        <div class="phrase-option selected" data-phrase="SPLAT!">SPLAT!</div>
+                        <div class="phrase-option" data-phrase="Buzz-ted!">Buzz-ted!</div>
+                        <div class="phrase-option" data-phrase="Bug off!">Bug off!</div>
+                        <div class="phrase-option" data-phrase="Squished!">Squished!</div>
+                        <div class="phrase-option" data-phrase="Swatted!">Swatted!</div>
+                        <div class="phrase-option" data-phrase="Game Over!">Game Over!</div>
+                    </div>
+                </div>
+                
+                <button id="start-game-btn">Start Game</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/player.js"></script>
+    <script src="js/aiPlayer.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/backgroundEffects.js"></script>
+    <script src="js/deathEffects.js"></script>
+    <script src="js/startScreen.js"></script>
+    <script src="js/websocketManager.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html> 
