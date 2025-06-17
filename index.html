@@ -3,118 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fly PvP Clicker</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>PavlukhinLab</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div id="game-container">
-        <canvas id="game-canvas"></canvas>
-        <div id="central-button">
-            <span>DON'T</span>
-            <span>TOUCH</span>
-            <span>ME!</span>
-        </div>
-        <div id="death-banner" class="hidden">You Died</div>
-        <div id="scoreboard">
-            <div class="scoreboard-header">
-                <h2>Scoreboard</h2>
-                <button id="toggle-scoreboard">⇄</button>
-            </div>
-            <ul id="scores"></ul>
-        </div>
-        
-        <!-- Compact score display (hidden initially) -->
-        <div id="compact-score" class="hidden">
-            <span id="player-rank"></span>
-            <span id="player-emoji"></span>
-            <span id="player-score"></span>
-        </div>
-        
-        <!-- Settings button -->
-        <div id="settings-button">⚙️</div>
-        
-        <!-- Settings panel -->
-        <div id="settings-panel" class="hidden">
-            <div class="settings-header">
-                <h2>Settings</h2>
-                <span id="close-settings">×</span>
-            </div>
-            <div class="customization-section">
-                <label>Change your insect:</label>
-                <div class="emoji-options">
-                    <div class="emoji-option" data-emoji="🪰">🪰</div>
-                    <div class="emoji-option" data-emoji="🦟">🦟</div>
-                    <div class="emoji-option" data-emoji="🐝">🐝</div>
-                    <div class="emoji-option" data-emoji="🦗">🦗</div>
-                    <div class="emoji-option" data-emoji="🐞">🐞</div>
-                    <div class="emoji-option" data-emoji="🦋">🦋</div>
-                    <div class="emoji-option" data-emoji="🐜">🐜</div>
-                    <div class="emoji-option" data-emoji="🕷️">🕷️</div>
-                </div>
-            </div>
-            <div class="customization-section">
-                <label>Change your death phrase:</label>
-                <div class="phrase-options">
-                    <div class="phrase-option" data-phrase="SPLAT!">SPLAT!</div>
-                    <div class="phrase-option" data-phrase="Buzz-ted!">Buzz-ted!</div>
-                    <div class="phrase-option" data-phrase="Bug off!">Bug off!</div>
-                    <div class="phrase-option" data-phrase="Squished!">Squished!</div>
-                    <div class="phrase-option" data-phrase="Swatted!">Swatted!</div>
-                    <div class="phrase-option" data-phrase="Game Over!">Game Over!</div>
-                </div>
-            </div>
-            <button id="save-settings-btn">Save Settings</button>
-        </div>
-        
-        <!-- Start screen with player customization -->
-        <div id="start-screen">
-            <div id="customization-container">
-                <h1>Fly PvP Clicker</h1>
-                
-                <div class="customization-section">
-                    <label for="player-name">Enter your name:</label>
-                    <input type="text" id="player-name" maxlength="15" placeholder="Your name (max 15 chars)" value="Player">
-                    <div class="character-count"><span id="name-char-count">0</span>/15</div>
-                </div>
-                
-                <div class="customization-section">
-                    <label>Choose your insect:</label>
-                    <div class="emoji-options">
-                        <div class="emoji-option selected" data-emoji="🪰">🪰</div>
-                        <div class="emoji-option" data-emoji="🦟">🦟</div>
-                        <div class="emoji-option" data-emoji="🐝">🐝</div>
-                        <div class="emoji-option" data-emoji="🦗">🦗</div>
-                        <div class="emoji-option" data-emoji="🐞">🐞</div>
-                        <div class="emoji-option" data-emoji="🦋">🦋</div>
-                        <div class="emoji-option" data-emoji="🐜">🐜</div>
-                        <div class="emoji-option" data-emoji="🕷️">🕷️</div>
-                    </div>
-                </div>
-                
-                <div class="customization-section">
-                    <label>Choose your death phrase:</label>
-                    <div class="phrase-options">
-                        <div class="phrase-option selected" data-phrase="SPLAT!">SPLAT!</div>
-                        <div class="phrase-option" data-phrase="Buzz-ted!">Buzz-ted!</div>
-                        <div class="phrase-option" data-phrase="Bug off!">Bug off!</div>
-                        <div class="phrase-option" data-phrase="Squished!">Squished!</div>
-                        <div class="phrase-option" data-phrase="Swatted!">Swatted!</div>
-                        <div class="phrase-option" data-phrase="Game Over!">Game Over!</div>
-                    </div>
-                </div>
-                
-                <button id="start-game-btn">Start Game</button>
-            </div>
-        </div>
-    </div>
+    <header>
+        <nav>
+            <a href="index.html" class="nav-link active">Home</a>
+            <a href="art.html" class="nav-link">Art</a>
+        </nav>
+    </header>
 
-    <script src="js/player.js"></script>
-    <script src="js/aiPlayer.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/backgroundEffects.js"></script>
-    <script src="js/deathEffects.js"></script>
-    <script src="js/startScreen.js"></script>
-    <script src="js/websocketManager.js"></script>
-    <script src="js/game.js"></script>
+    <main>
+        <section id="intro" class="reveal">
+            <h1>PavlukhinLab</h1>
+            <p>TODOTODOTODOTODO</p>
+        </section>
+
+        <section id="announcement" class="reveal">
+            <h2>Coming Soon!</h2>
+            <p>I'm currently working on a new tool for game developers, powered by AI. Stay tuned for updates!</p>
+        </section>
+
+        <section id="projects" class="reveal">
+            <h2>Projects</h2>
+            <div class="gallery">
+                <div class="card reveal">
+                    <img src="images/timeboat.png" alt="Timeboat">
+                    <h3>Timeboat.io <span class="new-label">new</span></h3>
+                    <p>An experimental online narrative demo where a Time Traveler rescues historical figures from time anomalies, merging them into a single meta-entity whose combined characteristics drive an alternative timeline.</p>
+                    <a href="https://timeboat.io" target="_blank" class="project-link">Play</a>
+                </div>
+                <div class="card reveal">
+                    <img src="images/retrorefiner.png" alt="Retro Refine Project Image">
+                    <h3>retro-refiner</h3>
+                    <p>An interactive tool for iteratively refining image generation prompts using DSPy and the RetroDiffusion API. It allows for automatic prompt revision and user feedback to guide the process.</p>
+                    <a href="https://github.com/Archelunch/retro-refiner" target="_blank" class="project-link">Source code</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="reveal">
+        <p>Feel free to reach out at <a href="mailto:michael@pavlukhinlab.com" aria-label="Email">michael@pavlukhinlab.com</a>, or connect with me through the links below:</p>
+        <div class="social-links">
+            <a href="mailto:michael@pavlukhinlab.com" aria-label="Email"><i class="fas fa-envelope"></i></a>
+            <a href="https://www.linkedin.com/in/mpavlukhin/" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            <a href="https://x.com/mike_pavlukhin" target="_blank" aria-label="Twitter/X"><i class="fab fa-x-twitter"></i></a>
+            <a href="https://github.com/Archelunch" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
 </body>
-</html> 
+</html>

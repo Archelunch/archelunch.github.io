@@ -1,0 +1,208 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Poppins:wght@300;400;700&display=swap');
+
+:root {
+    --background-color: #121212;
+    --primary-color: #00ff9b;
+    --primary-gradient: linear-gradient(45deg, #00ff9b, #00e0ff);
+    --text-color: #e0e0e0;
+    --card-background: rgba(30, 30, 30, 0.6);
+    --border-color: rgba(68, 68, 68, 0.5);
+    --blur-intensity: 10px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+h1, h2, h3 {
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+header {
+    padding: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    transition: background-color 0.4s ease, border-bottom 0.4s ease;
+}
+
+header.scrolled {
+    background-color: var(--card-background);
+    backdrop-filter: blur(var(--blur-intensity));
+    border-bottom: 1px solid var(--border-color);
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.nav-link {
+    color: var(--text-color);
+    font-size: 1.2rem;
+    padding: 0.5rem;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.nav-link.active,
+.nav-link:hover {
+    color: var(--primary-color);
+    text-shadow: 0 0 5px var(--primary-color);
+}
+
+main {
+    flex: 1;
+    padding: 4rem 1rem;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+section {
+    margin-bottom: 5rem;
+}
+
+#intro h1 {
+    font-size: 2.5rem;
+}
+
+#announcement {
+    background-color: transparent;
+    padding: 1.5rem;
+    border-left: 3px solid var(--primary-color);
+    border-image: var(--primary-gradient) 1;
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+.card {
+    background-color: var(--card-background);
+    backdrop-filter: blur(var(--blur-intensity));
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 20px rgba(0, 255, 155, 0.25);
+}
+
+.card img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+    border-bottom: none;
+}
+
+.project-link {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.project-link:hover {
+    background-color: var(--primary-color);
+    background-image: var(--primary-gradient);
+    color: var(--background-color);
+    border-color: transparent;
+}
+
+.new-label {
+    display: inline-block;
+    margin-left: 0.75rem;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    color: var(--background-color);
+    background: var(--primary-gradient);
+    border-radius: 5px;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
+.tags {
+    margin-bottom: 1rem;
+}
+
+.tag {
+    display: inline-block;
+    background-color: rgba(51, 51, 51, 0.7);
+    color: var(--text-color);
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    margin-right: 0.5rem;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+footer {
+    text-align: center;
+    padding: 2rem 1rem;
+    background-color: transparent;
+    border-top: 1px solid var(--border-color);
+}
+
+.social-links a {
+    margin: 0 1rem;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+    font-size: 1.5rem;
+}
+
+.social-links a:hover {
+    color: var(--primary-color);
+}
+
+@media (min-width: 768px) {
+    .gallery {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    #intro h1 {
+        font-size: 3.5rem;
+    }
+}
+
+/* For scroll animations */
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.6s ease-out;
+}
+
+.reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
